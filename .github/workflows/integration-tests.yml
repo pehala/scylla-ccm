@@ -38,7 +38,7 @@ jobs:
 
     - name: Install dependencies
       run: |       
-        pip install -U pip setuptools
+        pip install -U pip setuptools scylla-driver
         pip install .
 
         if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
