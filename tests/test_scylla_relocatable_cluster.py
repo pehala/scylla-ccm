@@ -11,11 +11,11 @@ from ccmlib.node import Node, ToolError
 class TestScyllaRelocatableCluster:
     def test_get_scylla_full_version(self, relocatable_cluster):
         install_dir = relocatable_cluster.get_install_dir()
-        assert get_scylla_full_version(install_dir) == '2025.1.0-dev-0.20250119.1ef2d9d07692'
+        assert get_scylla_full_version(install_dir) == '2024.2.3-0.20250108.931ce203dcf5'
 
     def test_get_scylla_version(self, relocatable_cluster):
         install_dir = relocatable_cluster.get_install_dir()
-        assert get_scylla_version(install_dir) == '2025.1.0-dev'
+        assert get_scylla_version(install_dir) == '2024.2.3'
 
     def test_nodetool_timeout(self, relocatable_cluster):
         node1: Node = relocatable_cluster.nodelist()[0]
