@@ -27,11 +27,11 @@ class CCMCluster:
         self.use_scylla = use_scylla
         self.relocatable_version = relocatable_version
         self.docker_image = docker_image
-        # self.id = os.getenv("PYTEST_XDIST_WORKER", "gw0").replace("gw", "")
+        self.id = os.getenv("PYTEST_XDIST_WORKER", "gw0").replace("gw", "")
         self._process = None
 
     def get_create_cmd(self, args=None):
-        cmd_args = [self.ccm_bin, 'create', self.name] #, "--id", self.id]
+        cmd_args = [self.ccm_bin, 'create', self.name, "--id", self.id]
         if self.use_scylla and self.relocatable_version:
             cmd_args += ["--scylla", "-v", self.relocatable_version]
         elif self.use_scylla and self.docker_image:
