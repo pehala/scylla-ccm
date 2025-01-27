@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import uuid
 
 from ccmlib import common
 
@@ -20,16 +21,17 @@ class CCMCluster:
             except Exception:
                 pass
 
-        self.name = f"{self.__class__.__name__}-{test_id}"
+        self.name = f"{self.__class__.__name__}-{test_id}-{uuid.uuid4()}"
         self.ccm_bin = os.path.join(os.curdir, "ccm")
         self.cluster_dir = os.path.join(common.get_default_path(), self.name)
         self.use_scylla = use_scylla
         self.relocatable_version = relocatable_version
         self.docker_image = docker_image
+        # self.id = os.getenv("PYTEST_XDIST_WORKER", "gw0").replace("gw", "")
         self._process = None
 
     def get_create_cmd(self, args=None):
-        cmd_args = [self.ccm_bin, 'create', self.name]
+        cmd_args = [self.ccm_bin, 'create', self.name] #, "--id", self.id]
         if self.use_scylla and self.relocatable_version:
             cmd_args += ["--scylla", "-v", self.relocatable_version]
         elif self.use_scylla and self.docker_image:
@@ -77,7 +79,7 @@ class CCMCluster:
                 'range_request_timeout_in_ms:10000',
                 'write_request_timeout_in_ms:10000',
                 'truncate_request_timeout_in_ms:10000',
-                'request_timeout_in_ms:10000'
+                'request_timeout_in_ms:10000',
         ]
 
     def run_command(self, cmd):
@@ -88,17 +90,14 @@ class CCMCluster:
     def validate_command_result(self, expected_status_code=0):
         stdout, stderr = self.process.communicate(timeout=600)
         status_code = self.process.wait()
-        try:
-            stdout = stdout.strip()
-            stderr = stderr.strip()
+        # try:
+        stdout = stdout.strip()
+        stderr = stderr.strip()
 
-            LOGGER.debug(f"[stdout] {stdout}")
-            LOGGER.debug(f"[stderr] {stderr}")
-            assert status_code == expected_status_code
-            return stdout, stderr
-        except AssertionError:
-            LOGGER.error(f"[ERROR] {stderr.strip()}")
-            raise
+        LOGGER.debug(f"[stdout] {stdout}")
+        LOGGER.debug(f"[stderr] {stderr}")
+        assert status_code == expected_status_code, f"Process returned {status_code} but expected {expected_status_code}: {stderr}"
+        return stdout, stderr
 
     def parse_cluster_status(self, stdout):
         """

@@ -69,7 +69,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        python -m pytest ./tests -x
+        python -m pytest ./tests -x -n4
 
     - name: Copy logs/results
       if: contains(github.event.pull_request.labels.*.name, 'PR-upload-log')

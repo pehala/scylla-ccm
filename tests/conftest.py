@@ -32,7 +32,7 @@ def test_id():
 @pytest.fixture(scope="session")
 def test_dir(test_id, results_dir):
     max_test_dirs, dir_count = 100, 1
-    test_dir = results_dir / Path("ccm-" + test_id)
+    test_dir = results_dir / Path(f"ccm-{test_id}")
     while test_dir.exists() and dir_count <= max_test_dirs:
         test_dir = results_dir / Path(f"ccm-{test_id}-{dir_count}")
         dir_count += 1
@@ -41,7 +41,7 @@ def test_dir(test_id, results_dir):
         LOGGER.critical(f"Number of test directories is '{dir_count}'. Max allowed: '{max_test_dirs}'")
         assert dir_count >= max_test_dirs
     test_dir = os.getcwd() / test_dir
-    test_dir.mkdir()
+    test_dir.mkdir(exist_ok=True)
     LOGGER.info(f"Test directory '{test_dir}' created.")
     return test_dir
 
@@ -88,37 +88,37 @@ def relocatable_cluster(test_dir, test_id):
         cluster.clear()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def ccm_docker_cluster():
     cluster = CCMCluster(test_id="docker", docker_image=SCYLLA_DOCKER_IMAGE)
     return cluster
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def ccm_reloc_cluster():
     cluster = CCMCluster(test_id="reloc", relocatable_version=SCYLLA_RELOCATABLE_VERSION)
     return cluster
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def ccm_reloc_with_manager_cluster():
     cluster = CCMCluster(test_id="reloc_manager", relocatable_version=SCYLLA_RELOCATABLE_VERSION)
     return cluster
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def ccm_cassandra_cluster():
     cluster = CCMCluster(use_scylla=False, test_id="cassandra")
     return cluster
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def ccm_reloc_latest_cluster():
     cluster = CCMCluster(test_id="reloc_master", relocatable_version="unstable/master:latest")
     return cluster
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def cluster_under_test(request):
     cluster = request.getfixturevalue(request.param)
     return cluster
